@@ -1,0 +1,174 @@
+<html class="artdeco windows" lang="en">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>JobSet</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+      <link rel="stylesheet" href="static/9dbsc5j9tu83ryxdj86wa3ws8">
+      <link rel="stylesheet" href="static/8x6d2mc8lwnz7iumozsjnmv5">
+      <link rel="stylesheet" href="static/5gdn0osmg9rdfdl2jy8rxb2ui">
+      <link rel="stylesheet" href="static/88oz6vh4yxlj37mzv1i81srxi">
+      <link rel="stylesheet" href="static/7s7fmtn7d1vuj8bj1fr2in3me" class="lazy-css">
+      <link rel="stylesheet" href="static/6qe6pkxmmhsfmzu8ifq3vm8fz">
+      <link rel="stylesheet" href="static/adrer4ed5iayatjgnie2z4s0v">
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            $(".job-card-container").click(function(){
+               var job_link = $(this).data("jlink")
+               var title = $(this).data("title")
+               var cname = $(this).data("cname")
+               var dhtml = $(this).data("dhtml")
+               var elinks = $(".e_jlink")
+               for(var i=0;i<=elinks.length-1;i++){
+                  $(elinks[i]).attr("href",job_link);
+               }
+               $("#e_dhtml").html(dhtml)
+               $("#e_cname").html(cname)
+               $("#e_title").html(title)
+            })
+         })  
+      </script>
+   </head>
+   <body style="" cz-shortcut-listen="true" data-t-link-to-event-attached="true" class="render-mode-BIGPIPE nav-v2 theme theme--classic ember-application boot-complete icons-loaded" dir="ltr">
+      <div class="application-outlet ">
+        
+         <div class="authentication-outlet">
+            <div class="job-search-ext  ">
+               <div class="jobs-search-two-pane__wrapper">
+                  <div class="full-height neptune-grid one-column">
+                     <div class="jobs-search-two-pane__container  display-flex full-height ">
+                        <div class="jobs-search__left-rail" tabindex="-1">
+                           <section aria-label="search results" aria-describedby="jobs-search-jymbii-title jobs-search-jymbii-no-results-title jobs-search-make-me-move-title jobs-search-pre-screening-title search-results-title jobs-search-because-you-viewed-title" class="jobs-search-two-pane__results">
+                              <div class="jobs-search-results">
+                                 <ul class="jobs-search-results__list list-style-none" itemtype="http://schema.org/ItemList">
+
+
+
+
+                                    {% for job in jobs["jobset"] %}
+                                       <li id="ember1042" class="jobs-search-results__list-item occludable-update p0 relative ember-view">
+                                          <div>
+                                             <div data-job-id="2197182263" data-title="{{ job['title'] }}" data-cname="{{ job['company_name'] }}" data-dhtml="{{ job['desc_html'] }}" data-jlink="{{ job['job_link'] }}" class="job-card-container relative job-card-list job-card-container--clickable job-card-list--underline-title-on-hover  jobs-search-two-pane__job-card-container--viewport-tracking-0">
+                                                <div id="ember1043" class="flex-grow-1 artdeco-entity-lockup artdeco-entity-lockup--size-4 ember-view">
+                                                   
+                                                   <div id="ember1047" class="flex-grow-1 artdeco-entity-lockup__content ember-view">
+                                                      <div id="ember1048" class="full-width artdeco-entity-lockup__title ember-view">
+                                                         <a data-control-id="YniXIRko65APqW2ROlg7Pg==" href="{{ job['job_link'] }}" id="ember1049" class="disabled ember-view job-card-container__link job-card-list__title">
+                                                         {{ job['title'] }}
+                                                         </a>
+                                                         <div id="ember1050" class="artdeco-entity-lockup__badge ember-view">
+                                                            &nbsp;
+                                                         </div>
+                                                      </div>
+                                                      <div id="ember1051" class="artdeco-entity-lockup__subtitle ember-view">
+                                                         <a data-control-id="YniXIRko65APqW2ROlg7Pg==" data-control-name="job_card_company_link" href="https://www.linkedin.com/company/13638973/" id="ember1052" class="job-card-container__link job-card-container__company-name ember-view">
+                                                         {{ job['company_name'] }}
+                                                         </a>
+                                                      </div>  
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>     
+                                       </li>
+                                    {% endfor %}
+
+
+                                 </ul>
+                              </div>
+                           </section>
+                        </div>
+                        <section class="jobs-search__right-rail" tabindex="-1">
+                           <div class="jobs-search__job-details--container" aria-label="RPA Engineer">
+                              <div id="ember233" class="job-view-layout jobs-details ember-view">
+                                 <div class=" ">
+                                    <div class="relative
+                                       jobs-details__main-content
+                                       jobs-details__main-content--single-pane full-width" role="main">
+                                       <!---->
+                                       <div class="relative">
+                                          <div id="ember234" class="jobs-box jobs-box--fadein jobs-box--full-width jobs-details-top-card jobs-box--no-bottom-offset ember-view">
+                                             <div class="jobs-details-top-card__container">
+                                                <div>
+                                                   <a href="https://www.linkedin.com/company/fractal-analytics/life/" id="ember1277" class="ember-view">
+                                                   </a>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                   <div class="display-flex">
+                                                      <div class="jobs-details-top-card__content-container">
+                                                         <a href="{{ jobs['jobset'][0]['job_link'] }}" id="ember236" class="jobs-details-top-card__job-title-link ember-view" class="e_jlink">
+                                                            <h2 class="jobs-details-top-card__job-title t-20 t-black t-normal" id="e_title">
+                                                               {{ jobs['jobset'][0]['title'] }}
+                                                            </h2>
+                                                         </a>
+                                                         <div class="jobs-details-top-card__company-info t-14 t-black--light t-normal mt1">
+                                                            <span class="a11y-text">c</span>
+                                                            <a href="#" id="e_cname" class="jobs-details-top-card__company-url t-black--light t-normal ember-view">
+                                                            {{ jobs['jobset'][0]['company_name'] }}
+                                                            </a>
+                                                            <!---->        
+                                                         </div>
+                                                         <!---->      
+                                                      </div>
+                                                   </div>
+                                                   <div class="jobs-details-top-card__actions-container pl5 pb5">
+                                                      <div class="jobs-details-top-card__actions display-flex align-items-center">
+                                                         <div id="jt-entry-hovercard" class="ember-view">
+                                                            <div id="ember248" class="ember-view"></div>
+                                                         </div>
+                                                         <div id="jt-hoverable-outlet">
+                                                            <div id="artdeco-hoverable-jt-entry-hovercard" class="artdeco-hoverable-content  artdeco-hoverable-content--inverse-theme artdeco-hoverable-content--open-spacing artdeco-hoverable-content--undefined-placement" tabindex="-1" role="tooltip" aria-hidden="true">
+                                                               <div class="artdeco-hoverable-content__shell">
+                                                                  <div class="artdeco-hoverable-content__content">
+                                                                  </div>
+                                                                  <!---->    
+                                                               </div>
+                                                               <div class="artdeco-hoverable-content__arrow" aria-hidden="true"></div>
+                                                            </div>
+                                                         </div>
+                                                         <div class="jobs-s-apply jobs-s-apply--fadein inline-flex mr2">
+                                                            <div class="jobs-apply-button--top-card">
+                                                               <a href="{{ jobs['jobset'][0]['job_link'] }}" class="e_jlink" target="_blank">
+                                                                  <button aria-label="Apply to RPA Engineer on company website" id="ember1267" class="jobs-apply-button artdeco-button artdeco-button--3 artdeco-button--primary ember-view" data-control-name="shareProfileThenExternalApplyControl">
+                                                                     <!---->
+                                                                     <span class="artdeco-button__text">
+                                                                     Apply
+                                                                     </span>
+                                                                  </button>
+                                                               </a>
+                                                            </div>
+                                                         </div>     
+                                                      </div>  
+                                                   </div>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div id="ember251" class="jobs-box--fadein jobs-box--full-width jobs-box--with-cta-large jobs-description jobs-description--reformatted ember-view">
+                                       <!---->
+                                       <article class="jobs-description__container m4">
+                                          <div class="jobs-description__content jobs-description-content ">
+                                             <div class="jobs-box__html-content jobs-description-content__text t-14 t-normal" id="job-details" tabindex="-1">
+                                                <span id="e_dhtml">
+                                                   {{ jobs['jobset'][0]['desc_html']|safe }}
+                                                </span>
+                                             </div>
+                                             <div class="jobs-description__details">
+                                             </div>
+                                          </div>
+                                       </article>
+                                       <!---->
+                                    </div>
+                                    <!---->
+                                 </div>
+                              </div>
+                           </div>
+                        </section>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>
