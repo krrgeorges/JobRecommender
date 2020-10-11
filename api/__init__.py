@@ -11,5 +11,4 @@ class GatherJobPosts(Resource):
 	def get(self):
 		jobs = Miner().mine()
 		return jobs
-		# return Response(jobs,mimetype="application/json",status=200)
 
