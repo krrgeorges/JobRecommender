@@ -25,9 +25,12 @@ class Miner:
 		pages = 0
 		try:
 			pages = int(self.driver.find_elements_by_class_name("artdeco-pagination__indicator--number")[-1].text.strip())
-			print(pages)
 		except:
 			pages = 0
+
+		if pages > 10:
+			pages = 10
+
 		jobs = []
 		for i in range(0,pages):
 			url = page+"&start="+str(25*i)
@@ -71,7 +74,6 @@ class Miner:
 		self.driver.find_element_by_id("login-password-input").send_keys(Keys.ENTER)
 
 	def indeed_get_jobs(self,page):
-		self.driver.get(page)
 		i = 0
 		pjobmap = None
 		jobs = []
@@ -79,7 +81,6 @@ class Miner:
 			t_jobs = {}
 			jks = []
 			url = page+"&start="+str(10*i)
-			print(url)
 			self.driver.get(url)
 			jobmap = self.driver.execute_script('return jobmap;');
 			if jobmap == pjobmap:
@@ -109,7 +110,6 @@ class Miner:
 		mjobs = []
 		for keyword in self.config.indeed_search_pages:
 			jobs = self.indeed_get_jobs(self.config.indeed_search_pages[keyword])
-			print(len(jobs))
 			mjobs += jobs
 		return mjobs
 
@@ -117,10 +117,26 @@ class Miner:
 		rjobs = []
 		for job in jobset:
 			desc = job["desc"]
+
+			max_job_count = 4
+
+			mscore = 0
+
+			year_matches = re.findall(r'[0-9] year',desc)
+			for y in year_matches:
+				if int(y.replace(" year","")) > max_job_count:
+					mscore = -100
+
+			if len(re.findall(r'[0-9]\+ year',desc)) > 0:
+				mscore = -100
+
+			if mscore <= -100:
+				continue
+
 			symbols = ".()&,/"
 			e_score = 0
 			i_score = 0
-			mscore = 0
+			
 
 			for s in symbols:
 				desc = desc.replace(s," "+s+" ")
@@ -135,9 +151,20 @@ class Miner:
 					e_score = 1
 					mscore += self.config.exclusion_techs[exclusion]
 
-			if mscore >= 0:
-				job["score"] = mscore
-				rjobs.append(job)
+			# if mscore >= 0:
+			# 	job["score"] = mscore
+			# 	rjobs.append(job)
+
+
+			job["score"] = mscore
+			rjobs.append(job)
+
+		for i in range(0,len(rjobs)):
+			for j in range(i+1,len(rjobs)):
+				if rjobs[i]["score"] < rjobs[j]["score"]:
+					a = rjobs[i]
+					rjobs[i] = rjobs[j]
+					rjobs[j] = a
 
 		return rjobs
 

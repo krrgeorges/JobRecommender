@@ -1,6 +1,6 @@
 class MinerConfig:
-	exclusion_techs = {"react":-10,"angular":-10,"nodejs":-10,"node.js":-10,"django":-5,"c#":-10,"asp":-10,".net":-10,"senior":-20,"ml":-10,"machine learning":-10,"c++":-10,"lead":-10," c ":-10,"hadoop":-10,"spark":-10}
-	inclusion_techs = {"python":10,"automation":5,"selenium":5,"mining":5,"junior":10," 0-":10,"fresher":5," 0 ":10,"postgres":5,"mysql":5}
+	exclusion_techs = {"react":-10,"angular":-10,"nodejs":-10,"node.js":-10,"django":-5,"c#":-10,"asp":-10,".net":-10,"senior":-20,"ml":-10,"machine learning":-10,"c++":-10,"lead":-10," c ":-10,"hadoop":-10,"spark":-10,"sr.":-20,"aws":-5,"gcp":-5,"networking":-10,"amazon web services":-10}
+	inclusion_techs = {"python":20,"automation":5,"selenium":10,"mining":5,"junior":10," 0-":10,"fresher":5," 0 ":10,"postgres":10,"mysql":10,"java":5}
 
 
 	linkedin_search_pages = {"python":"https://www.linkedin.com/jobs/search/?f_TPR=r86400&geoId=100859113&keywords=python&location=India",
