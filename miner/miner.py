@@ -117,14 +117,12 @@ class Miner:
 		rjobs = []
 		for job in jobset:
 			desc = job["desc"]
-
-			max_job_count = 4
-
+			desc = desc.lower()
 			mscore = 0
 
-			year_matches = re.findall(r'[0-9] year',desc)
+			year_matches = re.findall(r'[0-9] (year|yrs)',desc)
 			for y in year_matches:
-				if int(y.replace(" year","")) > max_job_count:
+				if int(y.replace(" year","").replace(" yrs","")) > self.config.max_exp_years:
 					mscore = -100
 
 			if len(re.findall(r'[0-9]\+ year',desc)) > 0:
@@ -134,27 +132,19 @@ class Miner:
 				continue
 
 			symbols = ".()&,/"
-			e_score = 0
-			i_score = 0
-			
+			title = job["title"].lower()
 
 			for s in symbols:
 				desc = desc.replace(s," "+s+" ")
-				desc = desc.lower()
+				title = title.replace(s," "+s+" ")
+
 
 			for inclusion in self.config.inclusion_techs:
-				if inclusion in desc or inclusion in job["title"].lower():
-					i_score = 1
+				if inclusion in desc or inclusion in title:
 					mscore += self.config.inclusion_techs[inclusion]
 			for exclusion in self.config.exclusion_techs:
-				if exclusion in desc or exclusion in job["title"].lower():
-					e_score = 1
+				if exclusion in desc or exclusion in title:
 					mscore += self.config.exclusion_techs[exclusion]
-
-			# if mscore >= 0:
-			# 	job["score"] = mscore
-			# 	rjobs.append(job)
-
 
 			job["score"] = mscore
 			rjobs.append(job)
