@@ -103,12 +103,12 @@ class Miner:
             title = main_data["title"]
             job_link = "https://www.linkedin.com/jobs/view/"+job_id
             try:
-            	company_name = main_data["companyDetails"]["companyName"]
+                company_name = main_data["companyDetails"]["companyName"]
             except:
-            	try:
-            		company_name = master_data["included"][-1]["name"]
-            	except:
-            		company_name = ""
+                try:
+                        company_name = master_data["included"][-1]["name"]
+                except:
+                        company_name = ""
             job = {"title":title,"job_link":job_link,"company_name":company_name,"desc":desc_text,"portal":"Linkedin","desc_html":html}
             return job
 
@@ -125,11 +125,27 @@ class Miner:
                 for i in range(0,pages):
                         url = page+"&start="+str(25*i)
                         self.driver.get(url)
-                        csrf = self.driver.get_cookie("JSESSIONID")['value'].replace('"','')
-                        soup = bs(self.driver.page_source,"html.parser")
-                        divs = soup.find_all(lambda tag:tag.name=="div" and tag.get("data-job-id")!=None)
-                        for d in divs:
-                                job = self.send_request_for_jobdets(d.get("data-job-id"),csrf)
+
+                        job_card_containers = self.driver.find_elements_by_class_name("job-card-container")
+                        for job_card in job_card_containers:
+                                job_card.find_element_by_class_name("job-card-container__metadata-item").click()
+                                time.sleep(2)
+                                soup = bs(self.driver.page_source,"html.parser")
+                                try:
+                                        title_element = soup.find_all(lambda tag:tag.name == "a" and tag.get("class")!=None and "jobs-details-top-card__job-title-link" in tag.get("class"))[0]
+                                except:
+                                        continue
+                                job_link = "https://www.linkedin.com"+title_element.get("href")
+                                title = title_element.text.strip()
+                                try:
+                                        company_element = soup.find_all(lambda tag:tag.name == "img" and tag.get("class")!=None and "jobs-details-top-card__company-logo" in tag.get("class"))[0]
+                                        company_name = company_element.get("alt").strip()
+                                except:
+                                        company_name = ""
+                                desc_element = soup.find_all(lambda tag:tag.name == "div" and tag.get("class")!=None and "jobs-description-content__text" in tag.get("class"))[0].find_all("span")[0]
+                                desc = desc_element.text.strip()
+                                desc_html = str(desc_element)
+                                job = {"title":title,"job_link":job_link,"company_name":company_name,"desc":desc,"portal":"Linkedin","desc_html":desc_html}
                                 if job not in jobs:
                                         jobs.append(job)
                 return jobs

@@ -10,7 +10,7 @@ class MinerConfig:
 							 "automation":"https://www.linkedin.com/jobs/search/?f_TPR=r86400&geoId=100859113&keywords=automation&location=India",
 							 "jymbii":"https://www.linkedin.com/jobs/search/?geoId=102713980&location=India&pivotType=jymbii"}
 
-	linkedin_creds = {"username":"","password":""}
+	linkedin_creds = {"username":"rojitrgeorge@gmail.com","password":"Dragonvale@123"}
 
 	max_exp_years = 4
 
