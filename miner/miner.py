@@ -6,163 +6,120 @@ from miner_config import MinerConfig
 import time
 import json
 import re
+import random
 import furl
 from collections import OrderedDict
+
+
+headers = USER_AGENTS = [
+    ('Mozilla/5.0 (X11; Linux x86_64) '
+     'AppleWebKit/537.36 (KHTML, like Gecko) '
+     'Chrome/57.0.2987.110 '
+     'Safari/537.36'),  # chrome
+    ('Mozilla/5.0 (X11; Linux x86_64) '
+     'AppleWebKit/537.36 (KHTML, like Gecko) '
+     'Chrome/61.0.3163.79 '
+     'Safari/537.36'),  # chrome
+    ('Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) '
+     'Gecko/20100101 '
+     'Firefox/55.0'),  # firefox
+    ('Mozilla/5.0 (X11; Linux x86_64) '
+     'AppleWebKit/537.36 (KHTML, like Gecko) '
+     'Chrome/61.0.3163.91 '
+     'Safari/537.36'),  # chrome
+    ('Mozilla/5.0 (X11; Linux x86_64) '
+     'AppleWebKit/537.36 (KHTML, like Gecko) '
+     'Chrome/62.0.3202.89 '
+     'Safari/537.36'),  # chrome
+    ('Mozilla/5.0 (X11; Linux x86_64) '
+     'AppleWebKit/537.36 (KHTML, like Gecko) '
+     'Chrome/63.0.3239.108 '
+     'Safari/537.36'),  # chrome
+]
 
 class Miner:
         def __init__(self):
                 self.config = MinerConfig()
-                self.driver = webdriver.Chrome(executable_path="C://Users/Rojit/Downloads/chromedriver_win32/chromedriver.exe")
+                self.driver = webdriver.Chrome(executable_path="chromedriver.exe")
 
-
-        def linkedin_login(self):
-                self.driver.get("https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin")
-                self.driver.find_element_by_id("username").send_keys(self.config.linkedin_creds["username"])
-                self.driver.find_element_by_id("password").send_keys(self.config.linkedin_creds["password"])
-                self.driver.find_element_by_id("password").send_keys(Keys.ENTER)
-
-
-
-        def send_request_for_jobdets(self,job_id,csrf):
-            headers = {
-                    'authority': 'www.linkedin.com',
-                    'x-restli-protocol-version': '2.0.0',
-                    'x-li-lang': 'en_US',
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36',
-                    'x-li-page-instance': 'urn:li:page:d_flagship3_search_srp_jobs;xNAc8JzyQdGU9LdCrtGOFA==',
-                    'accept': 'application/vnd.linkedin.normalized+json+2.1',
-                    'x-li-deco-include-micro-schema': 'true',
-                    'csrf-token': csrf,
-                    'x-li-track': '{"clientVersion":"1.7.3783","osName":"web","timezoneOffset":5.5,"deviceFormFactor":"DESKTOP","mpName":"voyager-web","displayDensity":1,"displayWidth":1366,"displayHeight":768}',
-                    'sec-fetch-site': 'same-origin',
-                    'sec-fetch-mode': 'cors',
-                    'sec-fetch-dest': 'empty',
-                    'referer': 'https://www.linkedin.com/jobs/search/?f_TPR=r86400&geoId=100859113&keywords=junior%20software&location=India&start=0',
-                    'accept-language': 'en-US,en;q=0.9',
-                    'cookie': 'li_rm=AQGrOYPTXLyEvwAAAXUq_cPcUazxzOLeaymHoUJacv38KHtkXnz_9spatJV0utdzFUZVmlQEEWU0iAYSWvNBN9yRw4Ji4GwPYGphoZkEdMS0DCwyEKhW_OEI; lang=v=2&lang=en-us; JSESSIONID="'+csrf+'"; bcookie="v=2&140ff356-0151-4437-8f6a-fc8ee0e826bb"; bscookie="v=1&20201015064115d38ef5a1-6f2b-415e-8885-7d945e2139ebAQF4wvg_5XsyFZ4oF731CjjGtv9-s3Xw"; lissc=1; _ga=GA1.2.1583680518.1602744080; _gid=GA1.2.1056634971.1602744080; G_ENABLED_IDPS=google; liap=true; li_at=AQEDAS5eOPoC-WtEAAABdSr93m0AAAF1TwpibVYAsl3001nGhofvvDiQZiQuztHnl4E-CW-qK7r2MMKvVzn_T-IuVE4-0I1Yt0zR-7PLrVnElR_p81Xkzq9BzGWtLRDRhWEo0ulEbVsSoHMBnA1NL7_z; AMCV_14215E3D5995C57C0A495C55%40AdobeOrg=-408604571%7CMCIDTS%7C18551%7CvVersion%7C4.6.0; spectroscopyId=54911ca7-aac0-46f9-bf9e-f9878dce664c; li_sugr=6452a4aa-1ac2-40b1-985e-aaec58a8c6b7; li_oatml=AQHCHdV_k7kSrgAAAXUq_g6CZKLjFsj44pSWpiOOuI4z8VlSWb9_NFlARLhRU_tZhFL_tRkXAX4SmVkWz0P6RcGYi06eHHRy; UserMatchHistory=AQJ0FlC7l94gQgAAAXUq__OR2ZVLC_6awmrZZN5yV4iqPByaEN0sHup5GoCN5zA_LLaRCB3uW58sQKMDzEeaspf0j5dtHNM9JX-CV0XN2fHDZsKtI3oW7Thbdvb7UhKertEip4voK0ZCGr5BBkJRz1xSxyKWAUPxu8D_lM0ogmukZsQxU-BncDYoTOUBDUpDtDY5VcUmjTOH_AtiBZH_ciYMJuoE1a7ITexEaOnUh1bQ5PnYFqG6fRmM2HuG9XFonB_kRW8; lidc="b=OGST08:s=O:r=O:g=1827:u=1:i=1602744222:t=1602830622:v=1:sig=AQHNLRSAr0EbNkpHyCuRDSEjQzwQfHxV"',
-                }
-
-            params = (
-                    ('decorationId', 'com.linkedin.voyager.deco.jobs.web.shared.WebFullJobPosting-46'),
-                    ('topN', '1'),
-                    ('topNRequestedFlavors', 'List(IN_NETWORK,COMPANY_RECRUIT,SCHOOL_RECRUIT,HIDDEN_GEM,ACTIVELY_HIRING_COMPANY)'),
-                )
-                
-            response = requests.get('https://www.linkedin.com/voyager/api/jobs/jobPostings/'+job_id+'?decorationId=com.linkedin.voyager.deco.jobs.web.shared.WebFullJobPosting-46&topN=1&topNRequestedFlavors=List(IN_NETWORK,COMPANY_RECRUIT,SCHOOL_RECRUIT,HIDDEN_GEM,ACTIVELY_HIRING_COMPANY)', headers=headers)
-
-
-            master_data = json.loads(response.content.decode("utf-8"))
-            main_data = master_data["data"]
-            data = main_data["description"]
-            voyager_class_tag_map = {"com.linkedin.pemberly.text.Bold":"strong","com.linkedin.pemberly.text.Entity":"span","com.linkedin.pemberly.text.Hyperlink":"a","com.linkedin.pemberly.text.Italic":"i","com.linkedin.pemberly.text.LineBreak":"br","com.linkedin.pemberly.text.ListItem":"li","com.linkedin.pemberly.text.Paragraph":"p","com.linkedin.pemberly.text.Underline":"u"}
-            p_exceptions = ["com.linkedin.pemberly.text.ListItem"]
-            desc_text = data["text"]
-            attrs = data["attributes"]
-            html = ""
-            done_indexes = OrderedDict()
-            li_mode = False
-            for attr in attrs:
-                type = attr["type"]["$type"]
-                start = attr["start"]
-                tag_html = ""
-                len = attr["length"]
-                if str(start)+"-"+str(len) not in done_indexes:
-                    try:
-                        tag = voyager_class_tag_map[type]
-                        substring = desc_text[start:start+len]
-                        if tag == "br":
-                            tag_html = "</"+tag+">"
-                        else:
-                            tag_html = "<"+tag+">"+substring+"</"+tag+">"
-                    except:
-                        continue
-                    done_indexes[str(start)+"-"+str(len)] = tag_html
-                else:
-                    try:
-                        tag_html = done_indexes[str(start)+"-"+str(len)]
-                        tag = voyager_class_tag_map[type]
-                        if tag == "br":
-                            tag_html = "</"+tag+">"
-                        else:
-                            tag_html = "<"+tag+">"+tag_html+"</"+tag+">"
-                    except:
-                        continue
-                    done_indexes[str(start)+"-"+str(len)] = tag_html
-            for d in done_indexes:
-                if "<li>" in done_indexes[d] and li_mode == False:
-                    li_mode = True
-                    html += "<ul>"
-                if "<li>" not in done_indexes[d] and li_mode == True:
-                    li_mode = False
-                    html += "</ul>"
-                html += done_indexes[d]
-
-            if li_mode == True:
-                html += "</ul>"
-                li_mode = False
-            title = main_data["title"]
-            job_link = "https://www.linkedin.com/jobs/view/"+job_id
-            try:
-                company_name = main_data["companyDetails"]["companyName"]
-            except:
-                try:
-                        company_name = master_data["included"][-1]["name"]
-                except:
-                        company_name = ""
-            job = {"title":title,"job_link":job_link,"company_name":company_name,"desc":desc_text,"portal":"Linkedin","desc_html":html}
-            return job
 
         def linkedin_get_jobs(self,page):
                 self.driver.get(page)
-                pages = 0
-                try:
-                        pages = int(self.driver.find_elements_by_class_name("artdeco-pagination__indicator--number")[-1].text.strip())
-                except:
-                        pages = 0
-                if pages > 10:
-                        pages = 10
                 jobs = []
-                for i in range(0,pages):
-                        url = page+"&start="+str(25*i)
-                        self.driver.get(url)
+                SCROLL_PAUSE_TIME = 3
+                driver = self.driver
+                last_height = driver.execute_script("return document.body.scrollHeight")
+                while True:
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(SCROLL_PAUSE_TIME)
+                    new_height = driver.execute_script("return document.body.scrollHeight")
+                    job_card_containers = self.driver.find_elements_by_class_name("result-card")
+                    # if len(job_card_containers) > 100:
+                    #     break
+                    if new_height == last_height:
+                        try:
+                            driver.find_element_by_class_name("infinite-scroller__show-more-button--visible").click()
+                            time.sleep(SCROLL_PAUSE_TIME)
+                            continue
+                        except Exception as e:
+                            break
+                    last_height = new_height
+                job_card_containers = self.driver.find_elements_by_class_name("result-card")
+                for job_card in job_card_containers:
+                    data_id = job_card.get_attribute("data-id")
+                    data_search_id = job_card.get_attribute("data-search-id")
+                    jurl = "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{}?refId={}".format(data_id,data_search_id)
+                    try:
+                        soup = bs(requests.get(jurl,headers={"User-Agent" : headers[random.randrange(0,len(headers))][0]}).content,"html.parser")
+                    except:
+                        continue
+                    cfound = False;
+                    lis = soup.find_all(lambda tag:tag.name=="li" and tag.get("class")!=None and "job-criteria__item" in tag.get("class"))
+                    for li in lis:
+                        if li.find_all(lambda tag:tag.name=="h3" and tag.get("class")!=None and "job-criteria__subheader" in tag.get("class"))[0].text.strip().lower() == "job function":
+                            funcs = li.find_all(lambda tag:tag.name=="span" and tag.get("class")!=None and "job-criteria__text" in tag.get("class"))
+                            for f in funcs:
+                                fx = False
+                                for c in self.config.linkedin_criterias:
+                                    if c in f.text.strip():
+                                        cfound = True
+                                        fx = True
+                                        break
+                                if fx == True:
+                                    break
+                    if cfound == False:
+                        continue
+                    print(jurl)
+                    try:
+                            title_element = soup.find_all(lambda tag:tag.name == "a" and tag.get("data-tracking-control-name")!=None and "public_jobs_topcard_title" in tag.get("data-tracking-control-name"))[0]
+                    except Exception as e:
+                            continue
+                    job_link = title_element.get("href")
+                    title = title_element.text.strip()
+                    try:
+                            company_element = soup.find_all(lambda tag:tag.name=="img" and tag.get("class")!=None and "company-logo" in tag.get("class"))[0]
+                            company_name = company_element.get("alt").strip()
+                    except Exception as e:
+                            company_name = ""
+                    desc_element = soup.find_all(lambda tag:tag.name == "div" and tag.get("class")!=None and "show-more-less-html__markup" in tag.get("class"))[0]
+                    desc = desc_element.text.strip()
+                    desc_html = str(desc_element)
+                    job = {"title":title,"job_link":job_link,"company_name":company_name,"desc":desc,"portal":"Linkedin","desc_html":desc_html}
+                    if job not in jobs:
+                            jobs.append(job)
 
-                        job_card_containers = self.driver.find_elements_by_class_name("job-card-container")
-                        for job_card in job_card_containers:
-                                job_card.find_element_by_class_name("job-card-container__metadata-item").click()
-                                time.sleep(2)
-                                soup = bs(self.driver.page_source,"html.parser")
-                                try:
-                                        title_element = soup.find_all(lambda tag:tag.name == "a" and tag.get("class")!=None and "jobs-details-top-card__job-title-link" in tag.get("class"))[0]
-                                except:
-                                        continue
-                                job_link = "https://www.linkedin.com"+title_element.get("href")
-                                title = title_element.text.strip()
-                                try:
-                                        company_element = soup.find_all(lambda tag:tag.name == "img" and tag.get("class")!=None and "jobs-details-top-card__company-logo" in tag.get("class"))[0]
-                                        company_name = company_element.get("alt").strip()
-                                except:
-                                        company_name = ""
-                                desc_element = soup.find_all(lambda tag:tag.name == "div" and tag.get("class")!=None and "jobs-description-content__text" in tag.get("class"))[0].find_all("span")[0]
-                                desc = desc_element.text.strip()
-                                desc_html = str(desc_element)
-                                job = {"title":title,"job_link":job_link,"company_name":company_name,"desc":desc,"portal":"Linkedin","desc_html":desc_html}
-                                if job not in jobs:
-                                        jobs.append(job)
                 return jobs
 
         def linkedin_mine(self):
+                positionals = [str(i) for i in self.config.linkedin_positional]
                 mjobs = []
-                self.linkedin_login()
-                for keyword in self.config.linkedin_search_pages:
-                        jobs = self.linkedin_get_jobs(self.config.linkedin_search_pages[keyword])
+                fpr = [str(i) for i in self.config.linkedin_ftpr]
+                for kw in self.config.kws:
+                    for loc in self.config.locations:
+                        page = "https://www.linkedin.com/jobs/search/?f_TP={}&keywords={}&f_E={}&location={}".format("%2C".join(fpr),kw.replace(" ","%20"),"%2C".join(positionals),loc)
+                        jobs = self.linkedin_get_jobs(page)
                         mjobs += jobs
                 return mjobs
-
-        def indeed_login(self):
-                self.driver.get("https://secure.indeed.com/account/login?hl=en_IN&co=IN&continue=https%3A%2F%2Fwww.indeed.co.in%2F%3Fr%3Dus&tmpl=desktop&service=my&from=gnav-util-homepage&jsContinue=https%3A%2F%2Fwww.indeed.co.in%2F&empContinue=https%3A%2F%2Faccount.indeed.com%2Fmyaccess&_ga=2.78877840.569756457.1602329412-2070962453.1599910892")
-                self.driver.find_element_by_id("login-email-input").send_keys(self.config.indeed_creds["username"])
-                self.driver.find_element_by_id("login-password-input").send_keys(self.config.indeed_creds["password"])
-                self.driver.find_element_by_id("login-password-input").send_keys(Keys.ENTER)
 
         def indeed_get_jobs(self,page):
                 i = 0
@@ -193,14 +150,18 @@ class Miner:
                         for d in desc_json:
                                 job = {"title":t_jobs[d]["title"],"job_link":t_jobs[d]["job_link"],"company_name":t_jobs[d]["company_name"],"desc":bs(desc_json[d],"html.parser").text.strip(),"portal":"Indeed","desc_html":desc_json[d]}
                                 jobs.append(job)
+                        if len(jobs) > 100:
+                            break
                         i+=1
 
                 return jobs
 
         def indeed_mine(self):
                 mjobs = []
-                for keyword in self.config.indeed_search_pages:
-                        jobs = self.indeed_get_jobs(self.config.indeed_search_pages[keyword])
+                for kw in self.config.kws:
+                    for loc in self.config.locations:
+                        page = "https://www.indeed.co.in/jobs?q={}&l={}&fromage=1&jt=fulltime".format(kw,loc)
+                        jobs = self.indeed_get_jobs(page)
                         mjobs += jobs
                 return mjobs
 
@@ -211,18 +172,46 @@ class Miner:
                         desc = desc.lower()
                         mscore = 0
 
-                        year_matches = re.findall(r'[0-9] (year|yrs)',desc)
+                        year_matches = re.findall(r'[0-9]+ year',desc)
                         for y in year_matches:
                                 try:
-                                        if int(y.replace(" year","").replace(" yrs","")) > self.config.max_exp_years:
+                                        if int(y.replace(" year","")) > self.config.max_exp_years:
                                                 mscore = -100
                                 except:
                                         continue
 
-                        if len(re.findall(r'[0-9]\+ year',desc)) > 0:
-                                mscore = -100
+                        year_matches = re.findall(r'[0-9]+-[0-9]+ year',desc)
+                        for y in year_matches:
+                                try:
+                                        y = y.replace(" year","").strip()
+                                        min = int(y.split("-")[0])
+                                        if min < self.config.min_exp_years:
+                                            mscore = -100
+                                except:
+                                        continue
 
-                        if mscore <= -100:
+                        year_matches = re.findall(r'[0-9]+ yr',desc)
+                        for y in year_matches:
+                                try:
+                                        if int(y.replace(" yr","")) > self.config.max_exp_years:
+                                                mscore = -100
+                                except:
+                                        continue
+
+                        year_matches = re.findall(r'[0-9]+-[0-9]+ yr',desc)
+                        for y in year_matches:
+                                try:
+                                        y = y.replace(" yr","").strip()
+                                        min = int(y.split("-")[0])
+                                        if min < self.config.min_exp_years:
+                                            mscore = -100
+                                except:
+                                        continue
+
+
+
+                        if mscore < -100:
+                                print("FUCKED")
                                 continue
 
                         symbols = ".()&,/"
@@ -243,19 +232,24 @@ class Miner:
                         job["score"] = mscore
                         rjobs.append(job)
 
-                for i in range(0,len(rjobs)):
-                        for j in range(i+1,len(rjobs)):
-                                if rjobs[i]["score"] < rjobs[j]["score"]:
-                                        a = rjobs[i]
-                                        rjobs[i] = rjobs[j]
-                                        rjobs[j] = a
+                sjobs = []
+                for r in rjobs:
+                    if r not in sjobs:
+                        sjobs.append(r)
 
-                return rjobs
+                for i in range(0,len(sjobs)):
+                        for j in range(i+1,len(sjobs)):
+                                if sjobs[i]["score"] < sjobs[j]["score"]:
+                                        a = sjobs[i]
+                                        sjobs[i] = sjobs[j]
+                                        sjobs[j] = a
+
+                return sjobs
 
         def mine(self):
                 data = {}
                 data["jobset"] = self.linkedin_mine()
-                data["jobset"] = data["jobset"] + self.indeed_mine()
+                # data["jobset"] = data["jobset"] + self.indeed_mine()
                 data["jobset"] = self.process(data["jobset"])
                 self.driver.close()
                 return data
